@@ -1,0 +1,52 @@
+---
+- name: Add SaltStack GPG key
+  ansible.builtin.apt_key:
+    url: https://repo.saltproject.io/salt/py3/ubuntu/22.04/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg
+    keyring: /etc/apt/keyrings/salt-archive-keyring-2023.gpg
+  become: true
+
+- name: Add SaltStack repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/salt-archive-keyring-2023.gpg arch=amd64] https://repo.saltproject.io/salt/py3/ubuntu/22.04/amd64/latest jammy main"
+    state: present
+    filename: salt.list
+  become: true
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install Salt Master components
+  apt:
+    name:
+      - salt-master
+      - salt-ssh
+      - salt-syndic
+      - salt-cloud
+      - salt-api
+    state: present
+  become: true
+
+- name: Enable and start Salt Master services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - salt-master
+    - salt-syndic
+    - salt-api
+  become: true
+
+- name: Configure Salt Master network settings
+  ansible.builtin.template:
+    src: network.conf.j2
+    dest: /etc/salt/master.d/network.conf
+  become: true
+
+- name: Restart Salt Master service
+  systemd:
+    name: salt-master
+    state: restarted
+  become: true

@@ -1,0 +1,12 @@
+---
+- name : Install Masters
+  hosts: masters
+  become: yes
+  roles:
+    - salt_master
+
+- name: Install minions
+  hosts: minions
+  become: yes
+  roles:
+    - salt_minion

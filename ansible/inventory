@@ -1,0 +1,5 @@
+[masters]
+master ansible_host=62.84.116.79 local_ip=10.250.240.12
+
+[minions]
+slave1 ansible_host=51.250.95.33 local_ip=10.250.240.18

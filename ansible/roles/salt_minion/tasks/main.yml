@@ -1,0 +1,58 @@
+---
+- name: Add SaltStack GPG key
+  ansible.builtin.apt_key:
+    url: https://repo.saltproject.io/salt/py3/ubuntu/22.04/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg
+    keyring: /etc/apt/keyrings/salt-archive-keyring-2023.gpg
+  become: true
+
+- name: Add SaltStack repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/salt-archive-keyring-2023.gpg arch=amd64] https://repo.saltproject.io/salt/py3/ubuntu/22.04/amd64/latest jammy main"
+    state: present
+    filename: salt.list
+  become: true
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+  become: true
+
+- name: Install Salt Minion components
+  apt:
+    name:
+      - salt-minion
+      - salt-ssh
+      - salt-syndic
+      - salt-cloud
+      - salt-api
+    state: present
+  become: true
+
+- name: Enable and start Salt Minion services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - salt-minion
+    - salt-syndic
+    - salt-api
+  become: true
+
+- name: Configure Salt Minion master settings
+  ansible.builtin.template:
+    src: master.conf.j2
+    dest: /etc/salt/minion.d/master.conf
+  become: true
+
+- name: Set Minion ID
+  ansible.builtin.template:
+    src: id.conf.j2
+    dest: /etc/salt/minion.d/id.conf
+  become: true
+
+- name: Restart Salt Minion service
+  ansible.builtin.systemd:
+    name: salt-minion
+    state: restarted
+  become: true
