@@ -1,0 +1,8 @@
+base:
+  '*':
+    - nginx
+    
+  'slave':
+    - nginx
+
+  
