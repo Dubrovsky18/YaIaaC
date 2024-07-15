@@ -13,7 +13,7 @@ resource "yandex_compute_instance" "slave" {
   }
 
   network_interface {
-    index = 1
+    index = 0
     subnet_id = "${yandex_vpc_subnet.kit_subnet.id}"
     nat = true
   }
