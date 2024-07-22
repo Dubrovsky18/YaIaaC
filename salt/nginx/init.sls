@@ -27,7 +27,7 @@ nginx_service:
     - mode: 644
 
 # Отправка файла index.html на удаленный хост
-/usr/share/nginx/html/index.html:
+/var/www/html/index.html:
   file.managed:
     - source: salt://nginx/index.html # путь к файлу на мастер-хосте
     - user: www-data
